@@ -18,7 +18,7 @@ cnoremap <C-o> <Cmd>call cmdhistory#Select()<CR>
 augroup setup-cmdhistory-plugin-for-cmdwin
   autocmd!
   autocmd CmdWinEnter * nnoremap <buffer> / <Cmd>call cmdhistory#Select()<CR>
-  autocmd User cmdhistory-initialize * SetupCmdhistory()
+  autocmd User cmdhistory-initialize SetupCmdhistory()
 augroup END
 
 def SetupCmdhistory()

@@ -205,7 +205,7 @@ EXAMPLE CONFIGURATION			*cmdhistory-example-configuration*
 	  autocmd!
 	  autocmd CmdWinEnter *
 		\ nnoremap <buffer> / <Cmd>call cmdhistory#Select()<CR>
-	  autocmd User cmdhistory-initialize * SetupCmdhistory()
+	  autocmd User cmdhistory-initialize SetupCmdhistory()
 	augroup END
 
 	def SetupCmdhistory()
