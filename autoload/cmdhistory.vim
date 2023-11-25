@@ -700,13 +700,26 @@ export def Select()
     return
   endif
   ff.Setup()
+enddef
+
+export def MapAction(key: string, actions: list<string>)
+  ff.MapAction(key, actions)
+enddef
+
+export def UnmapAction(key: string)
+  ff.UnmapAction(key)
+enddef
+
+export def SetDefaultMappings()
+  ff.MapAction('<CR>', ['accept'])
+  ff.MapAction('<C-f>', ['go-forward'])
+  ff.MapAction('<C-b>', ['go-backward'])
+  ff.MapAction('<C-a>', ['go-head'])
+  ff.MapAction('<C-e>', ['go-tail'])
   ff.MapAction('<C-h>', ['delete-character'])
   ff.MapAction('<BS>', ['delete-character'])
   ff.MapAction('<Del>', ['delete-character'])
   ff.MapAction('<C-u>', ['delete-to-head'])
-  ff.MapAction('<ESC>', ['no-operation'])
-  ff.MapAction('<C-@>', ['no-operation'])
-  ff.MapAction('<CR>', ['accept'])
   ff.MapAction('<C-p>', ['select-prev-item'])
   ff.MapAction('<C-k>', ['select-prev-item'])
   ff.MapAction('<C-n>', ['select-next-item'])
