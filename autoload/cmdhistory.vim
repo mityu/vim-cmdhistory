@@ -456,18 +456,6 @@ class FF
     this._action.Add('delete-word', this._promptDeleteWord)
     this._action.Add('delete-to-head', this._promptDeleteToHead)
     this._action.Add('no-operation', this._actionNop)
-
-    augroup plugin-cmdhistory-dummy
-      autocmd!
-      autocmd User cmdhistory-initialize :
-    augroup END
-
-    doautocmd User cmdhistory-initialize
-
-    augroup plugin-cmdhistory-dummy
-      autocmd!
-    augroup END
-    augroup! plugin-cmdhistory-dummy
   enddef
 
   def Setup()
@@ -726,3 +714,17 @@ export def SetDefaultMappings()
   ff.MapAction('<C-j>', ['select-next-item'])
   ff.MapAction('<C-l>', ['redraw'])
 enddef
+
+
+# Emit autocommand for user configuration initializations.
+augroup plugin-cmdhistory-dummy
+  autocmd!
+  autocmd User cmdhistory-initialize :
+augroup END
+
+doautocmd User cmdhistory-initialize
+
+augroup plugin-cmdhistory-dummy
+  autocmd!
+augroup END
+augroup! plugin-cmdhistory-dummy
