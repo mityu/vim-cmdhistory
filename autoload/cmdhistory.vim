@@ -106,15 +106,15 @@ class Window
 
     this._height = &lines * 3 / 4
     if this._height < 25
-      this._height = min([25, &lines - 2])  # -2 is the mergin for borders.
+      this._height = min([25, &lines - 2])  # -2 is the margin for borders.
     endif
 
     this._width = &columns * 3 / 4
     if this._width < 80
-      this._width = min([80, &columns - 2])  # -2 is the mergin for borders.
+      this._width = min([80, &columns - 2])  # -2 is the margin for borders.
     endif
 
-    this._displayRange = [0, this._height - 1]  # -1 is the mergin for prompt.
+    this._displayRange = [0, this._height - 1]  # -1 is the margin for prompt.
 
     this._winid = popup_create('', {
       wrap: false,
@@ -173,7 +173,7 @@ class Window
     # 'go up' comments is 'go cursor down' in visual.
     const scrolloff = getwinvar(this._winid, '&scrolloff')
     const itemSize = this._items->len()
-    const height = this._height - 1  # Make sure the mergin for prompt
+    const height = this._height - 1  # Make sure the margin for prompt
     var firstidx = -1
     var needScroll = true
 
@@ -252,7 +252,7 @@ class Window
 
     # Draw prompt
     const prompt = '>> '
-    const mergin = strchars(this._prompt.text) <= this._prompt.column ? ' ' : ''
+    const margin = strchars(this._prompt.text) <= this._prompt.column ? ' ' : ''
     const width = this._width - prompt->strdisplaywidth() - 1 - 2
 
     var column = 0
@@ -280,7 +280,7 @@ class Window
       column = prompt->strlen()
     endif
 
-    appendbufline(bufnr, '$', $'{prompt}{text}{mergin}')
+    appendbufline(bufnr, '$', $'{prompt}{text}{margin}')
     if this._cursorMatchID != nullID
       matchdelete(this._cursorMatchID, this._winid)
       this._cursorMatchID = nullID
