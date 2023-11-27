@@ -659,7 +659,7 @@ class FF
     var p = this.GetPrompt()
     if p.column != 0
       var text = p.SplitAtColumn()
-      text[0] = text[0]->substitute('\<\w\+$', '', '')
+      text[0] = text[0]->substitute('\<\w\+\s*$', '', '')
       p.text = text[0] .. text[1]
       p.column = strchars(text[0])
       this.SetPrompt(p)
