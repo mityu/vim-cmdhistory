@@ -78,6 +78,7 @@ cmdhistory#SetDefaultMappings()
 	<C-h>	["delete-character"]
 	<BS>	["delete-character"]
 	<Del>	["delete-character"]
+	<C-w>	["delete-word"]
 	<C-u>	["delete-to-head"]
 	<C-p>	["select-prev-item"]
 	<C-n>	["select-next-item"]
