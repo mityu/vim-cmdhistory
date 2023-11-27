@@ -128,7 +128,7 @@ class Window
       mapping: false,
       callback: this._onClosed,
     })
-    if getcmdtype() ==# ':'
+    if (getcmdtype() ?? getcmdwintype()) ==# ':'
       var syncmd = [
         'syntax include @Vim syntax/vim.vim',
         $'syntax region CmdhistoryVimHighlightRegion start=/\%1l/ end=/\%{this._height}l/ contains=@Vim'
