@@ -1,14 +1,16 @@
 # cmdhistory.vim
 
-This is a plugin written in Vim9 script to select command history on command-line and command-line window.
+This is a Vim plugin written in Vim9 script to select command-line history on command-line and command-line window.
 
 
 ## Requirements
 
-Vim 9.0.2129 or later.  Be careful that Vim may crash in prior version.
+Vim 9.0.2129 or later.  Be careful that Vim may crash on prior version.
 
 
 ## Example configuration
+
+In your .vimrc:
 
 ```vim
 vim9script

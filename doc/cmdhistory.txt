@@ -196,7 +196,7 @@ Additionally, to include backslash itself in match pattern, use "\\":
 ==============================================================================
 EXAMPLE CONFIGURATION			*cmdhistory-example-configuration*
 
->
+In your .vimrc: >
 	vim9script
 
 	cnoremap <C-o> <Cmd>call cmdhistory#Select()<CR>
