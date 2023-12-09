@@ -100,7 +100,7 @@ window, which is to quit this plugin.  You should call
 ==============================================================================
 AUTOCOMMANDS					*cmdhistory-autocommands*
 
-*cmdhistory* provides a |User| autocommand for customization.
+|cmdhistory| provides a |User| autocommand for customization.
 
 cmdhistory-initialize				*cmdhistory-initialize*
 	Invoked once on first launch of this plugin.  You can configure some
