@@ -27,8 +27,8 @@ def InCmdwin(): bool
 enddef
 
 class Prompt
-  public this.column = 0  # Column index in chars
-  public this.text = ''
+  public var column = 0  # Column index in chars
+  public var text = ''
 
   def newCopy(rhs: any)
     this.CopyFrom(rhs)
@@ -53,7 +53,7 @@ endclass
 
 class Source
   # Raw history entries.
-  this._items: list<string>
+  var _items: list<string>
 
   def Capture()
     this._items = execute($'history {getcmdtype() ?? getcmdwintype()}')
@@ -73,27 +73,27 @@ endclass
 
 
 class Window
-  static nullID = 0
-  static signName = 'cmdhistory-cursor'
-  static signGroup = 'PopUpCmdhistoryCursorline'
+  static var nullID = 0
+  static var signName = 'cmdhistory-cursor'
+  static var signGroup = 'PopUpCmdhistoryCursorline'
 
-  this._winid: number = nullID
-  this._signid: number = nullID  # SignID for cursor line
-  this._matchids: list<number>  # MatchIDs for highlighting matches
-  this._cursorMatchID: number = nullID  # MatchID for cursor on prompt
+  var _winid: number = nullID
+  var _signid: number = nullID  # SignID for cursor line
+  var _matchids: list<number>  # MatchIDs for highlighting matches
+  var _cursorMatchID: number = nullID  # MatchID for cursor on prompt
 
-  this._prompt: Prompt = Prompt.new()  # User inputs
-  this._items: list<string>  # Filtered history items
-  this._selectedIdx: number  # Index of selected item
+  var _prompt: Prompt = Prompt.new()  # User inputs
+  var _items: list<string>  # Filtered history items
+  var _selectedIdx: number  # Index of selected item
 
   # Range in item index to be displayed; items in range [a, b) will be shown.
-  this._displayRange: list<number>
+  var _displayRange: list<number>
 
-  this._width: number
-  this._height: number
+  var _width: number
+  var _height: number
 
-  this.CbFeedkey: func(string)  # See :h E704.
-  this.CbOnClose: func()
+  var CbFeedkey: func(string)  # See :h E704.
+  var CbOnClose: func()
 
   def Open(CbFeedkey: func(string), CbOnClose: func())
     sign_define(signName, {
@@ -348,7 +348,7 @@ endclass
 
 
 class Filter
-  this.filterPatterns: list<string>
+  var filterPatterns: list<string>
 
   def Clear()
     this.filterPatterns = []
@@ -379,7 +379,7 @@ endclass
 
 
 class Action
-  this._actions: dict<ActionFunc>
+  var _actions: dict<ActionFunc>
 
   def Add(name: string, Fn: ActionFunc)
     this._actions[name] = Fn
@@ -403,7 +403,7 @@ endclass
 
 
 class Keybind
-  this._keybinds: dict<list<string>>
+  var _keybinds: dict<list<string>>
 
   def Add(key: string, actions: list<string>)
     this._keybinds[NormalizeKeys(key)] = copy(actions)
@@ -425,15 +425,15 @@ endclass
 
 
 class FF
-  this._action: Action
-  this._filter: Filter
-  this._keybind: Keybind
-  this._prompt: Prompt
-  this._source: Source
-  this._window: Window
+  var _action: Action
+  var _filter: Filter
+  var _keybind: Keybind
+  var _prompt: Prompt
+  var _source: Source
+  var _window: Window
 
-  this._items: list<string>
-  this._selectedIdx: number
+  var _items: list<string>
+  var _selectedIdx: number
 
   def new()
     this._action = Action.new()
