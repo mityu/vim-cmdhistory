@@ -27,7 +27,7 @@ command-line such as commands, search patterns, and |input()| prompts.
 ==============================================================================
 REQUIREMENTS					*cmdhistory-requirements*
 
-Vim 9.0.2167 or later.
+Vim 9.0.2170 or later.
 
 
 ==============================================================================

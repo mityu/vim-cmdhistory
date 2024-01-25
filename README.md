@@ -5,7 +5,7 @@ This is a Vim plugin written in Vim9 script to select command-line history on co
 
 ## Requirements
 
-Vim 9.0.2167 or later.
+Vim 9.0.2170 or later.
 
 
 ## Example configuration

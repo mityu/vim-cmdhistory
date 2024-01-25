@@ -73,9 +73,9 @@ endclass
 
 
 class Window
-  static var nullID = 0
-  static var signName = 'cmdhistory-cursor'
-  static var signGroup = 'PopUpCmdhistoryCursorline'
+  static const nullID = 0
+  static const signName = 'cmdhistory-cursor'
+  static const signGroup = 'PopUpCmdhistoryCursorline'
 
   var _winid: number = nullID
   var _signid: number = nullID  # SignID for cursor line
