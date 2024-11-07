@@ -593,6 +593,10 @@ class FF
   enddef
 
   def _acceptItem()
+    if empty(this._items)
+      return
+    endif
+
     const selected = this._items[this._selectedIdx]
     this._terminate()
     if InCmdwin()
