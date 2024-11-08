@@ -558,6 +558,7 @@ class FF
     this._filter.Clear()
     this._prompt.Clear()
     this._items = []
+    this._selectedIdx = 0
   enddef
 
   def _selectNextItem()
