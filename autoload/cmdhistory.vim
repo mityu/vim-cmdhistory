@@ -56,9 +56,9 @@ class Source
   var _items: list<string>
 
   def Capture()
-    this._items = execute($'history {getcmdtype() ?? getcmdwintype()}')
-      ->split("\n")[1 :]
-      ->map((_, val: string): string => matchstr(val, '^>\?\s*\d\+\s\+\zs.\+$'))
+    const histname = getcmdtype() ?? getcmdwintype()
+    this._items = range(1, histnr(histname))
+      ->mapnew((_: number, v: number): string => histget(histname, v))
       ->reverse()
   enddef
 
