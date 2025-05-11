@@ -40,14 +40,15 @@ cmdhistory#Select()					*cmdhistory#Select()*
 						*cmdhistory#MapAction()*
 cmdhistory#MapAction({key}: string, {actions}: list<string>)
 	Map a key to a sequence of actions.  {key} is a single key to be
-	mapped and {actions} is a sequence of actions to be executed on key
-	typed. Actions specified to {actions} are executed in the order
+	mapped and {actions} is a sequence of actions to be executed when {key}
+	is typed.  Actions specified to {actions} are executed in the order
 	they're specified.
 	Different from Vim's mapping system, there're two limitations for this
 	function.
 	- You can only map a single key and cannot map a key sequence.  Here,
-	  "a single key" means what |popup-filter| gives in one callback.
-	- You cannot map <C-c> because it's reserved for quit action.
+	  the "a single key" means what |popup-filter| gives in one callback
+	  call.
+	- You cannot map <C-c> because it's reserved for the quit action.
 
 	Examples: >
 	# Select present item with <Tab>
@@ -105,6 +106,7 @@ AUTOCOMMANDS					*cmdhistory-autocommands*
 cmdhistory-initialize				*cmdhistory-initialize*
 	Invoked once on first launch of this plugin.  You can configure some
 	settings such as keybindings with this autocommand.
+	See |cmdhistory-example-configuration| for the example usage.
 
 
 ==============================================================================
@@ -124,11 +126,11 @@ redraw					*cmdhistory-builtin-action-redraw*
 	Redraw the selector window.
 
 select-next-item		*cmdhistory-builtin-action-select-next-item*
-	Select the next item on the selector window.  "Next item" means the
-	line above on window here.
+	Select the next item on the selector window.  The "Next item" means
+	the line above on window here.
 
 select-prev-item		*cmdhistory-builtin-action-select-prev-item*
-	Select the previous item on the selector window.  "Previous item"
+	Select the previous item on the selector window.  The "Previous item"
 	means the line below on window here.
 
 go-forward			*cmdhistory-builtin-action-go-forward*
