@@ -201,16 +201,6 @@ function s:draw() abort dict
   redraw
 endfunction
 
-function s:close() abort dict
-  if self._winid != s:null_id
-    " Clear this._winid variable first to guard this infinite recursion.
-    "    popup_close() -> popup-filter -> Close() -> popup_close() -> ...
-    let id = self._winid
-    let self._winid = s:null_id
-    call popup_close(id, -1)
-  endif
-endfunction
-
 " Returns TRUE if items are displayed in reversed order (i.e. newer items
 " appears bottom).
 function s:is_order_reversed() abort dict
@@ -218,7 +208,69 @@ function s:is_order_reversed() abort dict
   return v:true
 endfunction
 
+function s:on_closed() abort dict
+  const CbOnClose = self._cb_on_close
+
+  " Clear member variables
+  let self._winid = s:null_id
+  let self._signid = s:null_id
+  let self._matchids = []
+  let self._cursor_match_id = s:null_id
+  call self._prompt.clear()
+  let self._items = []
+  let self._selected_idx = 0
+  let self._display_range = []
+  let self._width = 0
+  let self._height = 0
+  let self._cb_feedkey = v:null
+  let self._cb_on_close = v:null
+
+  call call(CbOnClose, [])
+endfunction
+
 if has('nvim')
+  function s:open_window() abort dict
+    const buf = nvim_create_buf(v:false, v:true)
+    call nvim_set_option_value('bufhidden', 'wipe', #{ buf: buf })
+
+    const row = (&lines - self._height) / 2
+    const col = (&columns - self._width) / 2
+    const winid = nvim_open_win(buf, v:false, #{
+      \ relative: 'editor',
+      \ row: row,
+      \ col: col,
+      \ width: self._width,
+      \ height: self._height,
+      \ border: "double",
+      \ })
+    call nvim_set_option_value('winhl', 'Normal:Normal', { 'win': winid })
+
+    let g:cmdhistory_api = #{
+      \ on_close: function('s:nvim_on_window_closed', [self]),
+      \ }
+    call nvim_create_autocmd('WinClosed', #{
+      \ buffer: buf,
+      \ once: v:true,
+      \ nested: v:true,
+      \ command: 'if exists("g:cmdhistory_api") | call call(g:cmdhistory_api.on_close, []) | endif',
+      \ })
+    return winid
+  endfunction
+
+  function s:close_window() abort dict
+    if self._winid != s:null_id
+      " Clear this._winid variable first to guard this infinite recursion.
+      "    nvim_win_close() -> WinClosed -> s:close_window() -> nvim_win_close() -> ...
+      let id = self._winid
+      let self._winid = s:null_id
+      call nvim_win_close(id, v:false)
+    endif
+  endfunction
+
+  function s:nvim_on_window_closed(self) abort
+    unlet! g:cmdhistory_api
+    call a:self._on_closed()
+  endfunction
 else
   function s:open_window() abort dict
     return popup_create('', #{
@@ -233,24 +285,14 @@ else
       \ })
   endfunction
 
-  function s:on_closed(_key, _selected_idx) abort dict
-    const CbOnClose = self._cb_on_close
-
-    " Clear member variables
-    let self._winid = s:null_id
-    let self._signid = s:null_id
-    let self._matchids = []
-    let self._cursor_match_id = s:null_id
-    call self._prompt.clear()
-    let self._items = []
-    let self._selected_idx = 0
-    let self._display_range = []
-    let self._width = 0
-    let self._height = 0
-    let self._cb_feedkey = v:null
-    let self._cb_on_close = v:null
-
-    call call(CbOnClose, [])
+  function s:close_window() abort dict
+    if self._winid != s:null_id
+      " Clear this._winid variable first to guard this infinite recursion.
+      "    popup_close() -> popup-filter -> s:close_window() -> popup_close() -> ...
+      let id = self._winid
+      let self._winid = s:null_id
+      call popup_close(id, -1)
+    endif
   endfunction
 endif
 
@@ -281,11 +323,8 @@ let s:window = #{
   \ update_highlight: function('s:update_highlight'),
   \ move_selected_index: function('s:move_selected_index'),
   \ draw: function('s:draw'),
-  \ close: function('s:close'),
+  \ close: function('s:close_window'),
   \ is_order_reversed: function('s:is_order_reversed'),
   \ _open_window: function('s:open_window'),
+  \ _on_closed: function('s:on_closed'),
   \ }
-
-if !has('nvim')
-  let s:window._on_closed = function('s:on_closed')
-endif

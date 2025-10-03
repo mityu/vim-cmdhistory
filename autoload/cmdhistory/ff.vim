@@ -204,7 +204,8 @@ function s:accept_item() abort dict
     else
       call append('$', selected)
     endif
-    noautocmd normal! G$
+    " FIXME: `normal! G$` here doesn't work on Neovim.
+    noautocmd call cursor(line('$'), strlen(getline('$')))
   else
     call setcmdline(selected)
     redraw
