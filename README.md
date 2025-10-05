@@ -23,10 +23,10 @@ augroup setup-cmdhistory-plugin-for-cmdwin
 augroup END
 
 function s:setup_cmdhistory()
-  # Set plugin default mappings.
+  " Set plugin default mappings.
   call cmdhistory#set_default_mappings()
 
-  # Accept the present item with <Tab> key.
+  " Accept the present item with <Tab> key.
   call cmdhistory#map_action('<Tab>', ['accept'])
 endfunction
 ```
