@@ -1,4 +1,4 @@
-*cmdhistory.txt*	Command history selector plugin for Vim9
+*cmdhistory.txt*	Command history selector plugin
 
 Author: mityu
 License: MIT License
@@ -27,18 +27,19 @@ command-line such as commands, search patterns, and |input()| prompts.
 ==============================================================================
 REQUIREMENTS					*cmdhistory-requirements*
 
-Vim 9.0.2170 or later.
+- Vim 9.1.1230 or later.
+- Neovim v0.11.0 or later.
 
 
 ==============================================================================
 FUNCTIONS						*cmdhistory-functions*
 
-cmdhistory#Select()					*cmdhistory#Select()*
+cmdhistory#select()					*cmdhistory#select()*
 	Start command history selection.  Open command history selector window
 	and wait for user inputs.
 
-						*cmdhistory#MapAction()*
-cmdhistory#MapAction({key}: string, {actions}: list<string>)
+						*cmdhistory#map_action()*
+cmdhistory#map_action({key}: string, {actions}: list<string>)
 	Map a key to a sequence of actions.  {key} is a single key to be
 	mapped and {actions} is a sequence of actions to be executed when {key}
 	is typed.  Actions specified to {actions} are executed in the order
@@ -46,25 +47,26 @@ cmdhistory#MapAction({key}: string, {actions}: list<string>)
 	Different from Vim's mapping system, there're two limitations for this
 	function.
 	- You can only map a single key and cannot map a key sequence.  Here,
-	  the "a single key" means what |popup-filter| gives in one callback
-	  call.
-	- You cannot map <C-c> because it's reserved for the quit action.
+	  the "a single key" means what |getcharstr()| function can handle at
+	  once.
+	- You cannot map <C-c> because it's reserved for the quit action as
+	  for the emergency exit.
 
 	Examples: >
 	# Select present item with <Tab>
-	cmdhistory#MapAction('<Tab>', ['accept'])
+	call cmdhistory#map_action('<Tab>', ['accept'])
 
 	# Clear all input on prompt with <C-k>.
-	cmdhistory#MapAction('<C-k>', ['go-tail', 'delete-to-head'])
+	call cmdhistory#map_action('<C-k>', ['go-tail', 'delete-to-head'])
 <
 
-						*cmdhistory#UnmapAction()*
-cmdhistory#UnmapAction({key}: string)
+						*cmdhistory#unmap_action()*
+cmdhistory#unmap_action({key}: string)
 	Remove key binding for {key}.  {key} should be what specified in
-	|cmdhistory#MapAction()|.
+	|cmdhistory#map_action()|.
 
-					*cmdhistory#SetDefaultMappings()*
-cmdhistory#SetDefaultMappings()
+					*cmdhistory#set_default_mappings()*
+cmdhistory#set_default_mappings()
 	Set default mappings.  You can call this function on
 	|cmdhistory-initialize| event if you want to set this plugin's default
 	mappings.  The list of default mappings is here:
@@ -87,14 +89,33 @@ cmdhistory#SetDefaultMappings()
 	<C-j>	["select-next-item"]
 	<C-l>	["redraw"]
 
+cmdhistory#Select()					*cmdhistory#Select()*
+	DEPRECATED.
+	Please use |cmdhistory#select()| instead.
+
+						*cmdhistory#MapAction()*
+cmdhistory#MapAction({key}: string, {actions}: list<string>)
+	DEPRECATED.
+	Please use |cmdhistory#map_action()| instead.
+
+						*cmdhistory#UnmapAction()*
+cmdhistory#UnmapAction({key}: string)
+	DEPRECATED.
+	Please use |cmdhistory#unmap_action()| instead.
+
+					*cmdhistory#SetDefaultMappings()*
+cmdhistory#SetDefaultMappings()
+	DEPRECATED.
+	Please use |cmdhistory#set_default_mappings()| instead.
+
 
 ==============================================================================
 DEFAULT MAPPINGS				*cmdhistory-default-mappings*
 
 This plugin doesn't provide default mappings except for <C-c> on selector
 window, which is to quit this plugin.  You should call
-|cmdhistory#MapAction()| to add your original mappings or
-|cmdhistory#SetDefaultMappings()| to set some default mappings on
+|cmdhistory#map_action()| to add your original mappings or
+|cmdhistory#set_default_mappings()| to set some default mappings on
 |cmdhistory-initialize| event.
 
 
@@ -164,7 +185,7 @@ MATCHING ALGORITHM			*cmdhistory-matching-algorithm*
 User input is treated as space separated list of |regexp|s and only items
 matches for the every given |regexp| will only remain as filtered items. E.g.
 	- Input: "\<h\w*"
-		Items matches the regexp "\<h\w*" will remain. For example:
+		Items that matche the regexp "\<h\w*" will remain. Example:
 		- Item "good evening": removed
 			"good evening" does not matches the regexp.
 		- Item "hello": remain
@@ -172,7 +193,7 @@ matches for the every given |regexp| will only remain as filtered items. E.g.
 		- Item "hello cmdhistory.vim": remain
 			"hello cmdhistory.vim" matches the regexp "\<h\w*"
 	- Input: "\<h\w* \.vim$"
-		Items matches the both regexp "\<h\w*" and "\.vim$" will
+		Items that matche the both regexp "\<h\w*" and "\.vim$" will
 		remain. For example:
 		- Item "good evening": removed
 			"good evening" does not matches any of the regexps.
@@ -200,24 +221,22 @@ Additionally, to include backslash itself in match pattern, use "\\":
 EXAMPLE CONFIGURATION			*cmdhistory-example-configuration*
 
 In your .vimrc: >
-	vim9script
-
-	cnoremap <C-o> <Cmd>call cmdhistory#Select()<CR>
+	cnoremap <C-o> <Cmd>call cmdhistory#select()<CR>
 
 	augroup setup-cmdhistory-plugin-for-cmdwin
 	  autocmd!
 	  autocmd CmdWinEnter *
-		\ nnoremap <buffer> / <Cmd>call cmdhistory#Select()<CR>
-	  autocmd User cmdhistory-initialize SetupCmdhistory()
+		\ nnoremap <buffer> / <Cmd>call cmdhistory#select()<CR>
+	  autocmd User cmdhistory-initialize call s:setup_cmdhistory()
 	augroup END
 
-	def SetupCmdhistory()
+	function s:setup_cmdhistory()
 	  # Set plugin default mappings.
-	  cmdhistory#SetDefaultMappings()
+	  call cmdhistory#set_default_mappings()
 
 	  # Accept the present item with <Tab> key.
-	  cmdhistory#MapAction('<Tab>', ['accept'])
-	enddef
+	  call cmdhistory#map_action('<Tab>', ['accept'])
+	endfunction
 <
 
 
