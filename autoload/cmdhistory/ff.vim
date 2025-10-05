@@ -18,13 +18,22 @@ function s:setup() abort dict
   call self._action.add('no-operation', { -> self._action_nop() })
 
   call self._source.capture()
-  call self._window.open(
-    \ { rawkey -> self._on_key_typed(rawkey) },
-    \ { -> self._terminate() })
+  call self._window.open({ -> self._terminate() })
   let self._items = self._source.get()
   call self._window.set_items(self._items->copy())
   call self._window.set_prompt(self._prompt)
   call self._window.draw()
+  call self._main_loop()
+endfunction
+
+function s:_main_loop() abort dict
+  let self._exit_main_loop = v:false
+  while !self._exit_main_loop
+    let self._capturing_input = v:true
+    let key = getcharstr(-1, #{ cursor: 'hide' })
+    let self._capturing_input = v:false
+    call self._on_key_typed(key)
+  endwhile
 endfunction
 
 function s:get_prompt() abort dict
@@ -63,8 +72,16 @@ endfunction
 
 function s:on_key_typed(rawkey) abort dict
   const key = cmdhistory#util#normalize_keys(a:rawkey)
-  const actions = self._keybind.get_keybind(key)
+  if key ==# "\<C-c>"
+    call self._terminate()
+    return
+  elseif self._exit_main_loop && !has('nvim') && key ==# "\<CursorHold>"
+    " Dummy key by a hack in s:terminate() function.  Just ignore the
+    " key.  See the s:terminate() function for the details of the hack.
+    return
+  endif
 
+  const actions = self._keybind.get_keybind(key)
   if actions isnot v:null
     for action in actions
       call self._action.invoke(action)
@@ -112,13 +129,34 @@ function s:invoke_filter() abort dict
   call self._window.draw()
 endfunction
 
+" `terminate()` shutdowns this plugin.  This function is also used as the
+" callback when the popup is closed.
 function s:terminate() abort dict
+  let need_feeding_dummy_key = !has('nvim') && self._capturing_input
   call self._window.close()
   call self._source.release()
   call self._filter.clear()
   call self._prompt.clear()
   let self._items = []
   let self._selected_idx = 0
+  let self._exit_main_loop = v:true
+  let self._capturing_input = v:false
+
+  " After Vim 9.1.1230, popup windows without filter callback are also closed
+  " by <C-c>.  In that case, the main loop is still active although popup is
+  " closed, therefore we need to have a trick to explicitly exit the main
+  " loop.
+  if need_feeding_dummy_key
+    " Feed dummy character to consume getcharstr() call in the main loop.
+    " The <Ignore> key is ideal, but it seems that getcharstr() doesn't accept
+    " the <Ignore> key and we cannot use it here.
+    " We must be able to use any character instead of <Ignore> since it must
+    " be handled by getcharstr(), but we use <CursorHold> here because it
+    " must have mostly the smallest side-effect when it is unexpectedly fed to
+    " the actual userland. (The <CursorHold> key just invokes the CursorHold
+    " event.)
+    call feedkeys("\<CursorHold>", 'in')
+  endif
 endfunction
 
 function s:select_next_item() abort dict
@@ -253,6 +291,8 @@ let s:ff = #{
   \ _window: cmdhistory#window#new(),
   \ _items: [],
   \ _selected_idx: 0,
+  \ _exit_main_loop: v:false,
+  \ _capturing_input: v:false,
   \ setup: function('s:setup'),
   \ get_prompt: function('s:get_prompt'),
   \ set_prompt: function('s:set_prompt'),
@@ -275,4 +315,5 @@ let s:ff = #{
   \ _prompt_delete_word: function('s:prompt_delete_word'),
   \ _prompt_delete_to_head: function('s:prompt_delete_to_head'),
   \ _action_nop: function('s:action_nop'),
+  \ _main_loop: function('s:_main_loop'),
   \ }

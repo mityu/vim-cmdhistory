@@ -6,13 +6,12 @@ function cmdhistory#window#new() abort
   return deepcopy(s:window)
 endfunction
 
-function s:open(cb_feedkey, cb_on_close) abort dict
+function s:open(cb_on_close) abort dict
   call sign_define(s:sign_name, #{
     \ text: '>',
     \ linehl: 'Cursorline',
     \ })
 
-  let self._cb_feedkey = a:cb_feedkey
   let self._cb_on_close = a:cb_on_close
 
   let self._height = &lines * 3 / 4
@@ -199,9 +198,7 @@ function s:draw() abort dict
   const curline = self._height - 1 - (self._selected_idx - self._display_range[0])
   let self._signid = sign_place(0, s:sign_group, s:sign_name, bufnr, #{ lnum: curline })
 
-  if !cmdhistory#util#in_cmdwin()
-    redraw
-  endif
+  redraw
 endfunction
 
 function s:close() abort dict
@@ -232,15 +229,8 @@ else
       \ minwidth: self._width,
       \ highlight: 'Normal',
       \ border: [1, 1, 1, 1],
-      \ filter: self._key_filter,
-      \ mapping: v:false,
-      \ callback: self._on_closed,
+      \ callback: { _winid, _idx -> self._on_closed() },
       \ })
-  endfunction
-
-  function s:key_filter(_, key) abort dict
-    call call(self._cb_feedkey, [a:key])
-    return 1
   endfunction
 
   function s:on_closed(_key, _selected_idx) abort dict
@@ -283,7 +273,6 @@ let s:window = #{
   \ _display_range: [],
   \ _width: 0,
   \ _height: 0,
-  \ _cb_feedkey: v:null,
   \ _cb_on_close: v:null,
   \ open: function('s:open'),
   \ bufnr: function('s:bufnr'),
@@ -298,6 +287,5 @@ let s:window = #{
   \ }
 
 if !has('nvim')
-  let s:window._key_filter = function('s:key_filter')
   let s:window._on_closed = function('s:on_closed')
 endif
