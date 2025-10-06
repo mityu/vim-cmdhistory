@@ -5,7 +5,7 @@ This is a Vim plugin to select command-line history on command-line and command-
 
 ## Requirements
 
-- Vim 9.1.1230 or later.
+- Vim 9.0 or later.
 - Neovim v0.11.0 or later.
 
 

@@ -132,7 +132,9 @@ endfunction
 " `terminate()` shutdowns this plugin.  This function is also used as the
 " callback when the popup is closed.
 function s:terminate() abort dict
-  let need_feeding_dummy_key = !has('nvim') && self._capturing_input
+  let need_feeding_dummy_key =
+    \ !has('nvim') && has('patch-9.1.1230') && !has('patch-9.1.1826') &&
+    \ self._capturing_input
   call self._window.close()
   call self._source.release()
   call self._filter.clear()
@@ -142,10 +144,10 @@ function s:terminate() abort dict
   let self._exit_main_loop = v:true
   let self._capturing_input = v:false
 
-  " After Vim 9.1.1230, popup windows without filter callback are also closed
-  " by <C-c>.  In that case, the main loop is still active although popup is
-  " closed, therefore we need to have a trick to explicitly exit the main
-  " loop.
+  " Vim from 9.1.1230 to 9.1.1826, popup windows without filter callback are
+  " also closed by <C-c>.  In that case, the main loop is still active
+  " although popup is closed, therefore we need to have a trick to explicitly
+  " exit the main loop.
   if need_feeding_dummy_key
     " Feed dummy character to consume getcharstr() call in the main loop.
     " The <Ignore> key is ideal, but it seems that getcharstr() doesn't accept
